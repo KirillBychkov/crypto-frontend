@@ -1,0 +1,67 @@
+.stageWrapper
+  .rightAxis
+    z-index: 20
+    user-select: none
+    position: absolute
+    width: 50px
+    height: 100%
+    background: #535353
+    color: white
+    cursor: row-resize
+    font-size: 10px
+    padding: 2px 0 0 10px
+    top: 0
+    right: 0
+  .bottomAxis
+    z-index: 20
+    position: absolute
+    user-select: none
+    height: 20px
+    width: 100%
+    cursor: col-resize
+    color: white
+    font-size: 10px
+    padding: 2px 0 0 10px
+    background: #535353
+    bottom: 0
+    left: 0
+  .mainCanvas
+    box-sizing: border-box
+    border-left: 3px solid #535353
+    border-top: 3px solid #535353
+    position: relative
+    width: 100%
+    height: 100%
+    cursor: crosshair
+    &:before
+      pointer-events: none
+      align-items: flex-end
+      background-color: transparent
+      border-left: 1px dashed grey
+      content: ""
+      display: none
+      position: fixed
+      z-index: 20
+      width: 1px
+      height: calc(var(--height-prop-for-before) - 20px)
+      left: var(--left-prop-for-before)
+    &:after
+      pointer-events: none
+      justify-content: flex-end
+      background-color: transparent
+      border-top: 1px dashed grey
+      display: none
+      content: ""
+      height: 1px
+      z-index: 20
+      position: fixed
+      width: calc(var(--width-prop-for-after) - 50px)
+      top: var(--top-prop-for-after)
+  &:hover
+    .mainCanvas
+      &:before
+        display: flex
+        content: var(--content-prop-for-before)
+      &:after
+        display: flex
+        content: var(--content-prop-for-after)
