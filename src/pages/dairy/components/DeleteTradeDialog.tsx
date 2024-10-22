@@ -22,18 +22,27 @@ export function DeleteTradeDialog({ tradeId, disabled }: DeleteTradeDialogProps)
   const { dairyService } = useAxios();
   const [open, setOpen] = useState(false);
   const [omit, setOmit] = useState(false);
+  const [isDisable, setIsDisable] = useState(false);
+
   const deleteTrade = useMutation({
     mutationFn: (id: string) => dairyService?.delete("tradegroup/" + id),
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ['tradegroups'] });
       setOpen(false);
+      setIsDisable(false);
       if (omit) localStorage.setItem(omitConfirmKey, 'true');
       // TODO: Show toast
     },
   });
 
-  const onCancel = () => setOpen(false);
-  const onConfirm = () => deleteTrade.mutate(tradeId);
+  const onCancel = () => {
+    setIsDisable(false);
+    setOpen(false);
+  };
+  const onConfirm = () => {
+    setIsDisable(true);
+    deleteTrade.mutate(tradeId);
+  };
   const onDeleteClick = (e: MouseEvent) => {
     const shouldOmitDeleteModal = localStorage.getItem(omitConfirmKey) === 'true';
     if (!shouldOmitDeleteModal) return;
@@ -74,8 +83,8 @@ export function DeleteTradeDialog({ tradeId, disabled }: DeleteTradeDialogProps)
           <Button className="w-full" onClick={onCancel} variant="secondary">
             Cancel
           </Button>
-          <Button className="w-full" onClick={onConfirm} variant="destructive">
-            Delete
+          <Button className="w-full" onClick={onConfirm} disabled={isDisable} variant="destructive">
+            {isDisable? "Waiting..." : "Delete"}
           </Button>
         </div>
       </AlertDialogContent>

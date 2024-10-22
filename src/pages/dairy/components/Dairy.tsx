@@ -130,39 +130,23 @@ export function Dairy() {
     [tradeFilters, trades]
   );
 
+  const percentageThisMonth = useMemo(() => {
+    const monthlyTrades = trades.filter((tr) =>
+        new Date(tr.updatedAt).getMonth() === new Date().getMonth() && tr.result);
+
+    return Math.round(monthlyTrades.reduce((acc, trade) => trade.result + acc, 0 ) * 100 / deposit);
+  }, [trades, deposit]);
+
+  const percentageThisDay = useMemo(() => {
+    const dailyTrades = trades.filter((tr) =>
+        new Date(tr.updatedAt).getDay() === new Date().getDay() && tr.result);
+
+    return Math.round(dailyTrades.reduce((acc, trade) => trade.result + acc, 0) * 100 / deposit);
+  }, [trades, deposit]);
+
   const isLocked = useMemo(() => {
-    if (!trades || !trades.length || !user) {
-      return false;
-    }
-    const currentDate = new Date();
-    const firstTradeOfCurrentMonth = trades.find((trade) => {
-      const tradeDate = new Date(trade.createdAt);
-      return (
-        tradeDate.getMonth() === currentDate.getMonth() &&
-        tradeDate.getFullYear() === currentDate.getFullYear()
-      );
-    });
-    const firstTradeOfCurrentDay = trades.find((trade) => {
-      const tradeDate = new Date(trade.createdAt);
-      return (
-        tradeDate.getMonth() === currentDate.getMonth() &&
-        tradeDate.getFullYear() === currentDate.getFullYear() &&
-        tradeDate.getDate() === currentDate.getDate()
-      );
-    });
-    if (!firstTradeOfCurrentMonth) {
-      return false;
-    }
-    if (
-      firstTradeOfCurrentDay &&
-      (firstTradeOfCurrentDay.depositBefore / 100) * 95 > deposit
-    ) {
-      return true;
-    }
-    return (
-      (firstTradeOfCurrentMonth.depositBefore / 100) * 88 > deposit
-    );
-  }, [trades, user]);
+    return -10 >= percentageThisMonth || -2 >= percentageThisDay;
+  }, [trades]);
 
   return (
     <div className="container mx-auto py-10">
@@ -175,7 +159,22 @@ export function Dairy() {
           tradeFilters={tradeFilters}
           changeTradeFilters={setTradeFilters}
         />
-        <AddTradeDialog isLocked={isLocked} />
+        <div style={{ minWidth:'400px' }} className={'flex items-center justify-between'}>
+          <div>
+            <abbr title={"10% per month or 2% per day will disable next button"}>
+              <span className={'mr-4 '
+                  + (percentageThisMonth > 0 ? 'text-green-500 ' : ' ')
+                  + (percentageThisMonth < 0 ? 'text-red-500 ' : ' ')}>
+                This month ~ {percentageThisMonth || 0} %
+              </span><span className={'mr-4 '
+                + (percentageThisDay > 0 ? 'text-green-500 ' : ' ')
+                + (percentageThisDay < 0 ? 'text-red-500 ' : ' ')}>
+                Today ~ {percentageThisDay || 0} %
+              </span>
+            </abbr>
+          </div>
+          {!!deposit && <AddTradeDialog isLocked={isLocked} />}
+        </div>
       </div>
       <div className="mt-4">
         <DataTable columns={columns} data={filteredTrades} />

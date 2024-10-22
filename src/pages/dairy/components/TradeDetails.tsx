@@ -220,7 +220,9 @@ export function TradeDetails({ data, extraFunctionality }: TradeDetailsProps) {
                 Created / Updated dates
               </p>
               <p className={'flex'}>
-                {new Date(data?.createdAt).toLocaleString('en-GB')}
+                <abbr title={new Date(data?.createdAt).toUTCString()}>
+                  {new Date(data?.createdAt).toLocaleString('en-GB')}
+                </abbr>
                 {objCreate && <span className={'ml-3 mt-1'}>
                     <abbr title={objCreate.name}>
                       <objCreate.flag size={'small'}/>
@@ -229,7 +231,9 @@ export function TradeDetails({ data, extraFunctionality }: TradeDetailsProps) {
               </p>
               <p className={'flex'}>
                 {data?.closeScenario? <>
-                  {new Date(data?.updatedAt).toLocaleString('en-GB')}
+                  <abbr title={new Date(data?.updatedAt).toUTCString()}>
+                    {new Date(data?.updatedAt).toLocaleString('en-GB')}
+                  </abbr>
                   {objUpdate && <span className={'ml-3 mt-1'}>
                     <abbr title={objUpdate.name}>
                       <objUpdate.flag size={'small'}/>

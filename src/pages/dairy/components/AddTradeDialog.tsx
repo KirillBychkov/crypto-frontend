@@ -144,12 +144,14 @@ type AddTradeDialogProps = { isLocked: boolean };
 export function AddTradeDialog({ isLocked }: AddTradeDialogProps) {
   const { dairyService } = useAxios();
   const [open, setOpen] = useState(false);
+  const [isDisable, setIsDisable] = useState(false);
 
   const addTrade = useMutation({
     mutationFn: (data: TradeGroupRequest) => dairyService?.post("tradegroup", data),
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ['tradegroups'] });
       onOpenChange(false);
+      setIsDisable(false);
       // TODO: Show toast
     },
   });
@@ -159,6 +161,7 @@ export function AddTradeDialog({ isLocked }: AddTradeDialogProps) {
   });
 
   function onOpenChange(open: boolean) {
+    setIsDisable(false);
     setOpen(open);
     if (!open) {
       form.reset();
@@ -166,6 +169,7 @@ export function AddTradeDialog({ isLocked }: AddTradeDialogProps) {
   }
 
   function onSubmit(values: z.infer<typeof addTradeSchema>) {
+    setIsDisable(true);
     addTrade.mutate(values);
   }
 
@@ -295,8 +299,8 @@ export function AddTradeDialog({ isLocked }: AddTradeDialogProps) {
                 </FormItem>
               )}
             />
-            <Button className="w-full md:col-span-2" type="submit">
-              Submit
+            <Button className="w-full md:col-span-2" type="submit" disabled={isDisable}>
+                {isDisable? 'Waiting...' : 'Submit'}
             </Button>
           </form>
         </Form>

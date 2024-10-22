@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
-import { useAxios } from "@/auth/axios-hook.ts";
+import { useAxios } from "@/auth/axios-hook";
 import { useState, useEffect } from "react";
-import {TradeDetails} from "@/pages/dairy/components/TradeDetails.tsx";
+import {TradeDetails} from "@/pages/dairy/components/TradeDetails";
 
 export function SharePage() {
     const { dairyService } = useAxios();

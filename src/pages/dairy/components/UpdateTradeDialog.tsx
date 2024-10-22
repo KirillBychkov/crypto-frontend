@@ -83,7 +83,8 @@ export function UpdateTradeDialog({
   disabled,
 }: UpdateTradeDialogProps) {
     const [open, setOpen] = useState(false);
-    const {dairyService} = useAxios();
+    const [isDisable, setIsDisable] = useState(false);
+    const { dairyService } = useAxios();
 
     const updateTrade = useMutation({
         mutationFn: (data: UpdateData) =>
@@ -93,6 +94,7 @@ export function UpdateTradeDialog({
             queryClient.invalidateQueries({ queryKey: ['user'] });
             queryClient.invalidateQueries({ queryKey: ['deposit'] });
             onOpenChange(false);
+            setIsDisable(false);
         },
   });
 
@@ -103,10 +105,12 @@ export function UpdateTradeDialog({
 
   function onOpenChange(open: boolean) {
     setOpen(open);
+    setIsDisable(false);
     if (!open) form.reset();
   }
 
   function onSubmit(values: z.infer<typeof updateTradeForm>) {
+    setIsDisable(true);
     updateTrade.mutate({
         enters: values.enters,
         stops: values.stops,
@@ -201,8 +205,8 @@ export function UpdateTradeDialog({
                     </FormItem>
                 )}
             />
-            <Button className="w-full md:col-span-2" type="submit">
-              Submit
+            <Button disabled={isDisable} className="w-full md:col-span-2" type="submit">
+                {isDisable? "Waiting..." : "Submit"}
             </Button>
           </form>
         </Form>

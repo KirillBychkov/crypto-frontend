@@ -162,6 +162,9 @@ export function Wrapper() {
 
   return (
       <div>
+        <div className={'lg:hidden flex justify-center items-center xl:hidden 2xl:hidden fixed inset-0 z-50 bg-black/100'}>
+          <h2 className="text-3xl font-extrabold align-middle h-20">Don't trade on mobile phones!</h2>
+        </div>
         <div className="container mx-auto flex justify-between py-5">
           <div className="flex items-center gap-x-4">
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">

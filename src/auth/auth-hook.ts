@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { keycloak } from './KeycloakService.ts';
+import { keycloak } from './KeycloakService';
 
 export const useAuth = () => {
   const [user, setUser] = useState(null);

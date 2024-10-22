@@ -117,7 +117,7 @@ export default function ReactUploadCropper({ groupId, close }) {
                 });
             }}
             destination={{
-                url: "http://localhost:8084/v1/upload/" + groupId,
+                url: import.meta.env.VITE_SERVER_URL + "/upload/" + groupId,
                 headers: {
                     authorization: 'Bearer ' + token
                 }
