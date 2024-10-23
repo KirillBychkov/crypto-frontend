@@ -22,6 +22,7 @@ export function TradeDetails({ data, extraFunctionality }: TradeDetailsProps) {
   if (!data) return;
   const objCreate = checkKillZone(new Date(data?.createdAt));
   const objUpdate = checkKillZone(new Date(data?.updatedAt));
+  const sum = Math.round(data.avgEnter * data.quantity - (data.avgEnter * data.quantity * 0.1 / 100));
 
   return (
     <div className="bg-background">
@@ -67,7 +68,7 @@ export function TradeDetails({ data, extraFunctionality }: TradeDetailsProps) {
                     .sort((a, b) => data.position === 'Long' ? +a.price - +b.price : +b.price - +a.price)
                     .map(e => (
                         <p key={e._id} className={'flex'}>
-                          ${e.price.toFixed(2)} - {(data.quantity * e.percentage.replace('%', '') / 100).toFixed(3)}
+                          ${e.price.toFixed(2)} - {(data.quantity * e.percentage.replace('%', '') / 100).toFixed(5)}
                           {e.status === "pending" && <LoaderIcon className="ml-1 mt-0.5 h-4 w-4 text-yellow-200"/>}
                           {e.status === "fulfilled" &&
                               <SquareCheckBigIcon className="ml-1 mt-0.5 h-4 w-4 text-green-500"/>}
@@ -114,7 +115,7 @@ export function TradeDetails({ data, extraFunctionality }: TradeDetailsProps) {
                 Average Enter
               </p>
               <p>${data.avgEnter.toFixed(2)}</p>
-              <p>{(+data.quantity).toFixed(3)} {data.ticker.split('/')[0]}</p>
+              <p>{(+data.quantity).toFixed(5)} {data.ticker.split('/')[0]}</p>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">
@@ -125,16 +126,23 @@ export function TradeDetails({ data, extraFunctionality }: TradeDetailsProps) {
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">
-                Leverages
+                Leverages ( - 0.1% fee )
               </p>
-              <p>${Math.round(data.avgEnter * data.quantity)} x1 / ${Math.round(data.avgEnter * data.quantity / 10)} x10
-                / ${Math.round(data.avgEnter * data.quantity / 20)} x20</p>
-              <p>${Math.round(data.avgEnter * data.quantity / 30)} x30 /
-                ${Math.round(data.avgEnter * data.quantity / 40)} x40 /
-                ${Math.round(data.avgEnter * data.quantity / 50)} x50</p>
-              <p>${Math.round(data.avgEnter * data.quantity / 60)} x60 /
-                ${Math.round(data.avgEnter * data.quantity / 70)} x70 /
-                ${Math.round(data.avgEnter * data.quantity / 80)} x80</p>
+              <p>
+                {sum > data.lost? "$" + sum.toFixed(2) + " x1": ""}
+                {sum / 10 > data.lost? " / $" + (sum / 10).toFixed(2) + " x10": ""}
+                {sum / 20 > data.lost? " / $" + (sum / 20).toFixed(2) + " x20": ""}
+              </p>
+              <p>
+                {sum / 30 > data.lost? "$" + (sum / 30).toFixed(2) + " x30": ""}
+                {sum / 40 > data.lost? " / $" + (sum / 40).toFixed(2) + " x40": ""}
+                {sum / 50 > data.lost? " / $" + (sum / 50).toFixed(2) + " x50": ""}
+              </p>
+              <p>
+                {sum / 60 > data.lost? "$" + (sum / 60).toFixed(2) + " x60": ""}
+                {sum / 70 > data.lost? " / $" + (sum / 70).toFixed(2) + " x70": ""}
+                {sum / 80 > data.lost? " / $" + (sum / 80).toFixed(2) + " x80": ""}
+              </p>
             </div>
             <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground">

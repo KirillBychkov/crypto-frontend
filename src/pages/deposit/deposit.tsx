@@ -8,7 +8,7 @@ import {
     CardContent,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {useMutation, useQuery} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,7 +21,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { useAxios } from "@/auth/axios-hook.ts";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/auth/auth-hook.ts";
 
 const depositSchema = z.object({
@@ -31,10 +31,13 @@ const depositSchema = z.object({
 export function Deposit() {
     const { dairyService } = useAxios();
     const { user } = useAuth();
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const setDeposit = useMutation({
         mutationFn: (data) => dairyService?.post("deposit", { deposit: data.deposit }),
-        onSuccess: () => location.href = '/'
+        onSuccess: () => {
+            location.href = '/';
+        }
     });
 
     const { data: _deposit } = useQuery({
@@ -51,7 +54,9 @@ export function Deposit() {
         resolver: zodResolver(depositSchema),
         defaultValues: { deposit: 0 },
     });
+
     function onSubmit(values: z.infer<typeof depositSchema>) {
+        setIsDisabled(true);
         setDeposit.mutate({ deposit: values.deposit });
     }
 
@@ -85,8 +90,8 @@ export function Deposit() {
                                         </FormItem>
                                     )}
                                 />
-                                <Button type="submit" className="w-full">
-                                    Submit deposit
+                                <Button type="submit" className="w-full" disabled={isDisabled}>
+                                    {isDisabled? "Waiting..." : "Submit deposit"}
                                 </Button>
                             </form>
                         </Form>

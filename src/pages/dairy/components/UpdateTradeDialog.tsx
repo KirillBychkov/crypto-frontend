@@ -153,7 +153,7 @@ export function UpdateTradeDialog({
                 label="Enter orders fullfilled"
                 placeholder="Select enters"
                 items={trade.enterTrades
-                    .sort((a,b) => trade.position === 'Long'? +a.price - +b.price : +b.price - +a.price)
+                    .sort((a,b) => trade.position === 'Long'? +b.price - +a.price : +a.price - +b.price)
                     .map((e, i) => {
                       return e.price + ' / ' + Math.round(+e.percentage.replace('%', '') * (i + 1) + (trade.enterTrades.length === 2 && i === 2? 1 : 0) ) + '%'
                     })
