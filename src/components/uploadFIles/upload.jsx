@@ -1,16 +1,17 @@
-import React, { useCallback, useState } from "react";
+import React, {useCallback, useContext, useState} from "react";
 import Uploady, {
     useBatchAddListener,
     useItemFinalizeListener,
     useItemStartListener,
     useUploady
 } from "@rpldy/uploady";
+import { useAxios } from "@/auth/axios-hook";
+import { ToastContext } from "@/App";
 import { getUploadPreviewForBatchItemsMethod } from "@rpldy/upload-preview";
 import { useAuth } from "@/auth/auth-hook";
 import { queryClient } from "@/queryClient";
 import UploadButton from "@rpldy/upload-button";
 import './image.sass';
-import {useAxios} from "@/auth/axios-hook";
 
 const BatchAddUploadPreview =
     getUploadPreviewForBatchItemsMethod(useBatchAddListener);
@@ -89,6 +90,7 @@ const MyForm = () => {
 export default function ReactUploadCropper({ groupId, close }) {
     const { token } = useAuth();
     const { dairyService } = useAxios();
+    const toast = useContext(ToastContext);
     let i = 0;
 
     const filterBySize = useCallback((file) => {
@@ -111,10 +113,34 @@ export default function ReactUploadCropper({ groupId, close }) {
                     description: document.getElementById("description-for-trade")?.value
                 }).then((res) => {
                     if(res.status === 200) {
-                        close();
-                        queryClient.invalidateQueries({ queryKey: ["tradegroups"] });
+                        queryClient.invalidateQueries({ queryKey: ['tradegroups'] });
+                        toast.setToast({
+                            open: true,
+                            status: false,
+                            text: 'Upload successful!'
+                        })
+                    } else {
+                        toast.setToast({
+                            open: true,
+                            status: true,
+                            text: 'Upload failed!'
+                        })
                     }
-                });
+                }).catch((e) => {
+                    toast.setToast({
+                        open: true,
+                        status: true,
+                        text: e.message || 'Upload failed!'
+                    })
+                }).finally(() => close());
+            }}
+            onError={(e) => {
+                close();
+                toast.setToast({
+                    open: true,
+                    status: true,
+                    text: 'Upload failed!'
+                })
             }}
             destination={{
                 url: import.meta.env.VITE_SERVER_URL + "/upload/" + groupId,

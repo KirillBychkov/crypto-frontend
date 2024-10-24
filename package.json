@@ -22,6 +22,7 @@
     "@radix-ui/react-popover": "^1.1.1",
     "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.2",
     "@rpldy/mock-sender": "^1.8.3",
     "@rpldy/sender": "^1.8.3",
     "@rpldy/upload-button": "^1.8.3",

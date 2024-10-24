@@ -134,14 +134,14 @@ export function Dairy() {
     const monthlyTrades = trades.filter((tr) =>
         new Date(tr.updatedAt).getMonth() === new Date().getMonth() && tr.result);
 
-    return Math.round(monthlyTrades.reduce((acc, trade) => trade.result + acc, 0 ) * 100 / deposit);
+    return monthlyTrades.reduce((acc, trade) => trade.result + acc, 0 ) * 100 / deposit;
   }, [trades, deposit]);
 
   const percentageThisDay = useMemo(() => {
     const dailyTrades = trades.filter((tr) =>
         new Date(tr.updatedAt).getDay() === new Date().getDay() && tr.result);
 
-    return Math.round(dailyTrades.reduce((acc, trade) => trade.result + acc, 0) * 100 / deposit);
+    return dailyTrades.reduce((acc, trade) => trade.result + acc, 0) * 100 / deposit;
   }, [trades, deposit]);
 
   const isLocked = useMemo(() => {
@@ -161,15 +161,15 @@ export function Dairy() {
         />
         <div style={{ minWidth:'400px' }} className={'flex items-center justify-between'}>
           <div>
-            <abbr title={"10% per month or 2% per day will disable next button"}>
+            <abbr title={"-10% per month or -2% per day will disable next button"}>
               <span className={'mr-4 '
                   + (percentageThisMonth > 0 ? 'text-green-500 ' : ' ')
                   + (percentageThisMonth < 0 ? 'text-red-500 ' : ' ')}>
-                This month ~ {percentageThisMonth || 0} %
+                This month ~ {percentageThisMonth.toFixed(2) || 0} %
               </span><span className={'mr-4 '
                 + (percentageThisDay > 0 ? 'text-green-500 ' : ' ')
                 + (percentageThisDay < 0 ? 'text-red-500 ' : ' ')}>
-                Today ~ {percentageThisDay || 0} %
+                Today ~ {percentageThisDay.toFixed(2) || 0} %
               </span>
             </abbr>
           </div>

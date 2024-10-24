@@ -19,13 +19,14 @@ import { Input } from '@/components/ui/input';
 import { queryClient } from '@/queryClient';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import {useContext, useState} from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { PenIcon } from 'lucide-react';
 import { useAxios } from "@/auth/axios-hook.ts";
 import {ORDERS, TradeGroupResponse} from "@/shared/common.ts";
 import {FormSelect} from "@/shared/FormSelect.tsx";
+import {ToastContext} from "@/App.tsx";
 
 const updateTradeForm = z
     .object({
@@ -85,17 +86,32 @@ export function UpdateTradeDialog({
     const [open, setOpen] = useState(false);
     const [isDisable, setIsDisable] = useState(false);
     const { dairyService } = useAxios();
+    const toast = useContext(ToastContext);
 
     const updateTrade = useMutation({
         mutationFn: (data: UpdateData) =>
             dairyService?.put("tradegroup/" + trade.id + "/close", data),
-        onSuccess() {
+        onSuccess(res) {
             queryClient.invalidateQueries({queryKey: ['tradegroups'] });
             queryClient.invalidateQueries({ queryKey: ['user'] });
             queryClient.invalidateQueries({ queryKey: ['deposit'] });
             onOpenChange(false);
             setIsDisable(false);
+            toast.setToast({
+                open: true,
+                status: false,
+                text: 'Trade updated successfully!'
+            })
         },
+        onError(e) {
+            onOpenChange(false);
+            setIsDisable(false);
+            toast.setToast({
+                open: true,
+                status: true,
+                text: e.message || 'Failed to update the trade!'
+            })
+        }
   });
 
   const form = useForm<z.infer<typeof updateTradeForm>>({

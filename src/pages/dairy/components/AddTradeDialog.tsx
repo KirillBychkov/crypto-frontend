@@ -31,8 +31,9 @@ import { FormSelect } from '@/shared/FormSelect';
 import { Input } from '@/components/ui/input';
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/queryClient';
-import { useState } from 'react';
+import {useContext, useState} from 'react';
 import { useAxios } from "@/auth/axios-hook.ts";
+import {ToastContext} from "@/App.tsx";
 
 const addTradeSchema = z
   .object({
@@ -145,15 +146,29 @@ export function AddTradeDialog({ isLocked }: AddTradeDialogProps) {
   const { dairyService } = useAxios();
   const [open, setOpen] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
+  const toast = useContext(ToastContext);
 
   const addTrade = useMutation({
     mutationFn: (data: TradeGroupRequest) => dairyService?.post("tradegroup", data),
-    onSuccess() {
+    onSuccess(res) {
       queryClient.invalidateQueries({ queryKey: ['tradegroups'] });
       onOpenChange(false);
       setIsDisable(false);
-      // TODO: Show toast
+      toast.setToast({
+          open: true,
+          status: false,
+          text: 'Trade added successfully!'
+      })
     },
+    onError(e) {
+      onOpenChange(false);
+      setIsDisable(false);
+      toast.setToast({
+          open: true,
+          status: true,
+          text: e.message || 'Failed to add the trade!'
+      })
+    }
   });
   const form = useForm<z.infer<typeof addTradeSchema>>({
     resolver: zodResolver(addTradeSchema),
@@ -186,7 +201,7 @@ export function AddTradeDialog({ isLocked }: AddTradeDialogProps) {
             <br /><span className={"text-red-500"}>If you change your deposit manually pay attention of it!!</span>
           </DialogDescription>
         </DialogHeader>
-        {/* TODO: Move to separate component */}
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}

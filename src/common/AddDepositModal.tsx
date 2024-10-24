@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useContext, useState} from 'react';
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/form';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ToastContext } from "@/App.tsx";
 
 const depositSchema = z.object({
   deposit: z.coerce.number(),
@@ -31,13 +32,30 @@ const depositSchema = z.object({
 
 export function AddDepositModal() {
   const [open, setOpen] = useState(false);
+  const [isDisabled, setDisabled] = useState(false);
   const { dairyService } = useAxios();
+  const toast = useContext(ToastContext);
 
   const setDeposit = useMutation({
     mutationFn: (data) => dairyService?.put("deposit", { deposit: data.deposit }),
-    onSuccess: ()=> {
-      setOpen(false);
+    onSuccess: (res)=> {
       queryClient.invalidateQueries({ queryKey: ["deposit"] });
+      setOpen(false);
+      setDisabled(false);
+      toast.setToast({
+          open: true,
+          status: false,
+          text: 'Deposit added successfully!'
+      })
+    },
+    onError(e) {
+      setOpen(false);
+      setDisabled(false);
+      toast.setToast({
+          open: true,
+          status: true,
+          text: e.message || 'Failed to add the deposit!'
+      })
     }
   });
 
@@ -45,7 +63,9 @@ export function AddDepositModal() {
     resolver: zodResolver(depositSchema),
     defaultValues: { deposit: 0 },
   });
+
   function onSubmit(values: z.infer<typeof depositSchema>) {
+    setDisabled(true);
     setDeposit.mutate({ deposit: values.deposit });
   }
 
@@ -76,7 +96,9 @@ export function AddDepositModal() {
                   </FormItem>
                 )}
             />
-            <Button type="submit" className="w-full">Add money to balance</Button>
+            <Button type="submit" className="w-full" disabled={isDisabled}>
+                {isDisabled? "Waiting...": "Add money to balance"}
+            </Button>
           </form>
         </Form>
       </DialogContent>

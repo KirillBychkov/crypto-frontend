@@ -177,7 +177,7 @@ export function TradeDetails({ data, extraFunctionality }: TradeDetailsProps) {
               {!!data.result ? (
                   <p className={(data.status === 'success' ? 'text-green-500' : '') ||
                     (data.status === 'failed' ? 'text-red-500' : '')}>
-                    ${data.result.toFixed(2)} ({(data.result * 100 / data.depositBefore).toFixed(2)}% to deposit)
+                    ${data.result.toFixed(2)} ({(data.result * 100 / data.depositAfter).toFixed(2)}% to deposit)
                   </p>
               ) : (<p>-</p>)}
             </div>

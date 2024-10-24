@@ -9,10 +9,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { queryClient } from '@/queryClient';
 import { useMutation } from '@tanstack/react-query';
-import { useState, MouseEvent } from 'react';
+import {useState, MouseEvent, useContext} from 'react';
 import { TrashIcon } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAxios } from "@/auth/axios-hook.ts";
+import {ToastContext} from "@/App.tsx";
 
 const omitConfirmKey = 'omitDeleteModal';
 
@@ -23,16 +24,30 @@ export function DeleteTradeDialog({ tradeId, disabled }: DeleteTradeDialogProps)
   const [open, setOpen] = useState(false);
   const [omit, setOmit] = useState(false);
   const [isDisable, setIsDisable] = useState(false);
+  const toast = useContext(ToastContext);
 
   const deleteTrade = useMutation({
     mutationFn: (id: string) => dairyService?.delete("tradegroup/" + id),
-    onSuccess() {
+    onSuccess(res) {
       queryClient.invalidateQueries({ queryKey: ['tradegroups'] });
       setOpen(false);
       setIsDisable(false);
       if (omit) localStorage.setItem(omitConfirmKey, 'true');
-      // TODO: Show toast
+      toast.setToast({
+          open: true,
+          status: false,
+          text: 'Trade deleted successfully!'
+      })
     },
+    onError(e) {
+      setOpen(false);
+      setIsDisable(false);
+      toast.setToast({
+          open: true,
+          status: true,
+          text: e.message || 'Failed to delete the trade!'
+      })
+    }
   });
 
   const onCancel = () => {
@@ -65,7 +80,7 @@ export function DeleteTradeDialog({ tradeId, disabled }: DeleteTradeDialogProps)
             from database.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 hidden">
           <Checkbox
             checked={omit}
             onCheckedChange={(val) => setOmit(!!val)}
